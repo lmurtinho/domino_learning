@@ -25,32 +25,29 @@ class Player():
         """
         return self.score
     
-    def play_tile(self, tile, board):
+    def play(self, board, stack):
         """
         Check if player's hand has tile and if tile can be connected
         to board.
         Gets where to connect tile and passes tile to board.
         """
-        if self.hand.has_tile(tile):
+        tile = self.select_tile(board, stack)
+        if tile:
             connections = board.connections(tile)
             if all(connections):
-                begin = self.pick_position()
+                begin = self.pick_position(tile, board)
             elif any(connections):
-                if connections.index(True):
-                    begin = False
-                else:
-                    begin = True
+                begin = True if connections[0] else False
             else:
                 raise ValueError(u'Tile cannot be played.')
             board.add_tile(tile, begin)
-        else:
-            raise ValueError(u'Tile is not in hand.')
-    
+            self.hand.remove_tile(tile)
+
     def add_tile(self, tile):
         """
         Add tile to player hand.
         """
-        self.hand.get_tile(tile)
+        self.hand.add_tile(tile)
     
     def retrieve_hand(self):
         """

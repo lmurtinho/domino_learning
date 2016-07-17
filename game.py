@@ -1,4 +1,4 @@
-from player import Player
+from random_player import RandomPlayer
 from round import Round
 
 class Game():
@@ -6,14 +6,13 @@ class Game():
     Game class for dominoes.
     """
 
-    def __init__(self, n_players=4, n_tiles=7, max_number=6, 
-                 n_points=100, draw=True, player_names=[]):
-        """
-        Initializes a Game object.
-        """
+    def __init__(self, n_players=2, n_tiles=7, max_number=6, 
+                 n_points=100, draw=True, player_names=[], player_types=[]):
         player_names.extend(['Anon{}'.format(i)
                             for i in range(n_players - len(player_names))])
-        self.players = [Player(name=player_names[i]) 
+        player_types.extend([RandomPlayer
+                            for i in range(n_players - len(player_types))])
+        self.players = [player_types[i](name=player_names[i]) 
                         for i in range(n_players)]
         self.n_points = n_points
         self.n_tiles = n_tiles

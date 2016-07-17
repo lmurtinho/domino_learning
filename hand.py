@@ -5,7 +5,13 @@ class Hand():
     
     def __repr__(self):
         return str(self.tiles)
-        
+    
+    def __len__(self):
+        return len(self.tiles)
+    
+    def result(self):
+        return sum([item for sublist in self.tiles for item in sublist])
+    
     def add_tile(self, tile):
         """
         Append tile to hand.

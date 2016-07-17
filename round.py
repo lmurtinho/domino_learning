@@ -88,3 +88,34 @@ class Round():
         self.giveout()
         self.initialize_board()
         self.position_players()
+        while all([player.hand for player in self.players]) and \
+                self.board.open:
+            next_player = self.players[0]
+            next_player.play(self.board, self.stack)
+            self.rotate_players()
+            self.board.check_open(self.n_tiles + 1)
+            print 'board', self.board
+            print self.players[0], self.players[0].hand
+            print self.players[1], self.players[1].hand
+            print 'stack', self.stack
+            print
+        winner = self.define_winner()
+        score = self.define_score(winner)
+        return {'winner': winner, 'score': score}
+    
+    def define_winner(self):
+        points_per_player = {player: player.hand.result()
+                                for player in self.players}
+        winner = [player for player in points_per_player.keys()
+                  if points_per_player[player] == min(points_per_player.values())]
+        if len(winner) > 1:
+            return None
+        else:
+            return winner[0]
+    
+    def define_score(self, winner):
+        if not winner:
+            return 0
+        return sum([player.hand.result() 
+                    for player in self.players 
+                    if player != winner])

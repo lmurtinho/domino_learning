@@ -1,13 +1,19 @@
+from collections import Counter
+
 class Board():
     
     def __init__(self, initial_tile):
         self.tiles = [initial_tile]
+        self.open = True
     
     def get_borders(self):
         """
         Return board borders (where new tiles can go).
         """
         return (self.tiles[0][0], self.tiles[-1][-1])
+    
+    def __repr__(self):
+        return str(self.tiles)
 
     def connections(self, tile):
         """
@@ -15,7 +21,9 @@ class Board():
         begin or end of board.
         """
         borders = self.get_borders()
-        return (tile[0] in borders, tile[1] in borders)
+        border_start = tile[0] == borders[0] or tile[1] == borders[0]
+        border_end = tile[0] == borders[1] or tile[1] == borders[1]
+        return (border_start, border_end)
     
     def add_tile(self, tile, begin):
         """
@@ -24,18 +32,26 @@ class Board():
         if begin:
             connection = self.tiles[0][0]
             self.adjust_tile(tile, connection, begin)
-            self.tiles = tile + self.tiles
+            self.tiles = [tile] + self.tiles
         else:
             connection = self.tiles[-1][-1]
             self.adjust_tile(tile, connection, begin)
-            self.tiles += tile
+            self.tiles += [tile]
     
-    def adjust_tile(tile, connection, begin):
+    def adjust_tile(self, tile, connection, begin):
         """
         Position tile correctly to connect to desired position
         (begin if begin=True, end if begin=False).
         """
-        if begin and tile[1] != connection:
-            tile.reverse()
+        if begin:
+            if tile[1] != connection:
+                tile.reverse()
         elif tile[0] != connection:
             tile.reverse()
+    
+    def check_open(self, n_faces):
+        count_used = Counter([item for sublist in self.tiles
+                                for item in sublist
+                                if item in self.get_borders()])
+        if min(count_used.values()) == n_faces:
+            self.open = False

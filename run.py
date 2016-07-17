@@ -4,4 +4,5 @@ from round import Round
 g = Game()
 
 r = Round(g.players, g.draw, g.n_tiles, g.max_number)
-r.play_round()
+print r.play_round()
+p1, p2 = r.players
