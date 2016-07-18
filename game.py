@@ -3,11 +3,21 @@ from round import Round
 
 class Game():
     """
-    Game class for dominoes.
+    Game class for dominos.
     """
 
-    def __init__(self, n_players=2, n_tiles=7, max_number=6, 
-                 n_points=100, draw=True, player_names=[], player_types=[]):
+    def __init__(self, n_players=2, n_tiles=7, max_number=6,
+                 n_points=100, player_names=[], player_types=[]):
+        """
+        Initialize game.
+        n_players (int): Number of players.
+        n_tiles (int): Number of tiles in each player's starting hand.
+        max_number (int): Largest value in any side of a tile.
+        n_points (int): Points to be reached for a game to be over.
+        player_names (list of strings): List of strings with player's names.
+        player_types (list of Player objects): List of player types that
+        will play the game.
+        """
         player_names.extend(['Anon{}'.format(i)
                             for i in range(n_players - len(player_names))])
         player_types.extend([RandomPlayer
@@ -17,11 +27,10 @@ class Game():
         self.n_points = n_points
         self.n_tiles = n_tiles
         self.max_number = max_number
-        self.draw = draw
         self.history = []
     
     def __repr__(self):
-        strings = ["Dominoes Game.",
+        strings = ["Dominos Game.",
                    "Number of players: {}".format(len(self.players)),
                    "Initial number of tiles per player: {}".format(self.n_tiles),
                    "\nScore:"]
@@ -29,32 +38,42 @@ class Game():
         return '\n'.join(strings)        
     
     def str_game_score(self):
+        """
+        String with the game score (helper function for __repr__)
+        """
         ans = ['{0}: {1}'.format(player, player.get_score())
                 for player in self.players]
         return ans
 
     def game_score(self):
-        return [player.get_score() for player in self.players]
+        """
+        Return the current score per player.
+        """
+        return {player: player.get_score() for player in self.players}
     
     def play_game(self):
         """
-        Plays a game.
-        Starts score as game_score and, while the maximum score
-        is smaller than max_points, keeps looping:
-        - plays new round
-        - gets result from new round
-        - winner from new round takes points from new round
-        - round history appended to game history
-        - score updated.
-        returns dict with winner and game score
+        Play a game.
+        - Start score as game_score (usually 0)
+        - New rounds while no player reaches max_score        
+        - If winner on round, winner's score is updated
+        - History of game is updated with each round's result
+            (winner and score of round)
+        Return game winner and list of rounds results
         """
         score = self.game_score()
-        while max(score) < self.n_points:
-            new_round = Round(self.players, self.draw, 
-                              self.n_tiles, self.max_number)
-            result = new_round.play_round()
-            result['winner'].update_score(result['score'])
-            self.history.append(result['history'])
+        while max(score.values()) < self.n_points:
+            new_round = Round(self.players, self.n_tiles, self.max_number)
+            winner, score, _ = new_round.play_round()
+            try:
+                winner.update_score(score)
+            except AttributeError:
+                pass
+            self.history.append({'winner': str(winner), 'score': score})
             score = self.game_score()
-        winner = max(self.score, key=lambda x: self.score[x])
-        return {'winner': winner, 'score': score}
+            print self.str_game_score()
+            print
+        winner = [str(player) for player in self.players 
+                  if player.get_score() == max(score.values())][0]
+        return winner, self.history
+    

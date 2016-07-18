@@ -1,23 +1,26 @@
 from collections import Counter
 
 class Board():
+    """
+    Board class for dominos.
+    """
     
-    def __init__(self, initial_tile):
-        self.tiles = [initial_tile]
+    def __init__(self, tiles):
+        self.tiles = tiles
         self.open = True
     
+    def __repr__(self):
+        return str(self.tiles)
+
     def get_borders(self):
         """
         Return board borders (where new tiles can go).
         """
         return (self.tiles[0][0], self.tiles[-1][-1])
     
-    def __repr__(self):
-        return str(self.tiles)
-
     def connections(self, tile):
         """
-        Return tuple of booleans: wether tile can connect at
+        Return tuple of booleans: whether tile can connect at
         begin or end of board.
         """
         borders = self.get_borders()
@@ -50,6 +53,10 @@ class Board():
             tile.reverse()
     
     def check_open(self, n_faces):
+        """
+        Check if any tile not yet on board can be
+        added to it.
+        """
         count_used = Counter([item for sublist in self.tiles
                                 for item in sublist
                                 if item in self.get_borders()])

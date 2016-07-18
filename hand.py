@@ -28,7 +28,11 @@ class Hand():
         """
         Remove tile from hand.
         """
-        self.tiles.remove(tile)
+        try:
+            self.tiles.remove(tile)
+        except ValueError:
+                tile.reverse()
+                self.tiles.remove(tile.reverse())
     
     def check_possibles(self, board):
         return [tile for tile in self.tiles
